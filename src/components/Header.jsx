@@ -34,7 +34,7 @@ export default function Header(){
             <div className="md:px-10 py-5 px-7 md:flex justify-between items-center bg-[#ffffff]">
                 <div className="flex cursor-pointer items-center">
                     <p className="font-sans font text-2xl text-[#d5281d] font-bold">HEB</p>
-                    <p className="font-sans font text-2xl text-[#000000] font-bold">.RAIA</p>
+                    <p className="font-sans font text-2xl text-[#000000] font-bold">.MAIA</p>
                 </div>
                 <ul className={`md:flex ml-20 cursor-pointer pl-9 md:pl-0 md:items-center md:pb-0 pd-12 md:z-auto z-[-1] left-0 w-full transition-all duration-500 ease-in `}>
                     <li><p className="font-sans ml-5 mr-5 font text-xl text-[#000000] font-normal">ABOUT</p></li>
