@@ -9,7 +9,7 @@ import '../server'
 
 function App() {
   const [count, setCount] = useState(0)
-  app.use(cors());
+  // app.use(cors());
   return (
     <div data-testid="app-routes" >
     <BrowserRouter>
