@@ -3,8 +3,10 @@ import '../../../assets/Style.css';
 import './typingstyle.css';
 // import { FaBeer } from "react-icons/fa";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useState, useEffect, useRef} from "react";
+import { Link,useState, useEffect, useRef} from "react";
 import {chatMessage} from "../../../service/ChatAIService";
+import { useCartContext } from "../../../components/CartContext";
+import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 
 //for displaying the model view/Window
@@ -20,15 +22,37 @@ function ModalWindow(props) {
         setTimeout(() => {
             setIsTyping(true)
         },2000);
-        console.log(chatMessage(newmsg));
+        // console.log(chatMessage(newmsg));
        await chatMessage(newmsg).then((response) => {
-            sendUserMessage(response.data.outputResponse.message,
-                response.data.outputResponse.recipe.dishName,
-                response.data.outputResponse.recipe.ingredients,
-                response.data.outputResponse.recipe.instructions,
-                response.data.outputResponse.recommendedProducts,
-                response.data.outputResponse.suggestedProducts);
+            //single data
+            // sendUserMessage(response.data.outputResponse.message,
+            //     response.data.outputResponse.recipe.dishName,
+            //     response.data.outputResponse.recipe.ingredients ,
+            //     response.data.outputResponse.recipe.instructions,
+            //     response.data.outputResponse.recommendedProducts,
+            //     response.data.outputResponse.suggestedProducts);
+            //multi async data
+            // sendUserMessage(response.data.recipeResponse.message,
+            //     response.data.recipeResponse.recipe.dishName,
+            //     response.data.recipeResponse.recipe.ingredients ,
+            //     response.data.recipeResponse.recipe.instructions,
+            //     response.data.recommendedProductsResponse.recommendedProducts,
+            //     response.data.suggestedProductsResponse.suggestedProducts);
+
+            //multi async with quantity data
+            if (response.data.recipeResponse.recipe != null){
+            sendUserMessage(response.data.recipeResponse.message,
+                response.data.recipeResponse.recipe.dishName,
+                response.data.recipeResponse.recipe.ingredients ,
+                response.data.recipeResponse.recipe.instructions,
+                response.data.recommendedProductsResponse.message,
+                response.data.recommendedProductsResponse.recommendedProducts,
+                response.data.suggestedProductsResponse.message,
+                response.data.suggestedProductsResponse.suggestedProducts);
             console.log(response.data);
+            }else{
+                sendUserMessage(response.data.recipeResponse.message,"",[],[],"",[],"",[])
+            }
             
         }).catch((error) => {
             console.error(error);
@@ -37,26 +61,66 @@ function ModalWindow(props) {
     }
 
 
-    const productTotal = (quantity,price) => {
-        const total = price * quantity;
-        return total;
-    }
-   
-    useEffect(() => {
-        userMessages.map(fields => {
-            setCheckedItems(fields.suggested);
-        })
-      }, []);
+    const navigate = useNavigate();
 
-    const handleCheckboxChange = (event) => {
-        const { name, checked, value, dataset } = event.target;
-        const price = dataset.price;
-        setCheckedItems((prev) =>
-          checked
-            ? [...prev, { name, value, price}]
-            : prev.filter((item) => item.name !== name)
-        );
-      };
+    const goToShoppingCart = () => {
+        navigate('/shoppingcart');
+        // window.open('http://localhost:5173/shoppingcart', '_blank', 'noopener,noreferrer');
+    }
+
+    const {handleAddToCart} = useCartContext();
+   
+    // useEffect(() => {
+    //     userMessages.map(fields => {
+    //         setCheckedItems(fields.suggested);
+    //     })
+    //   }, []);
+
+    // const handleCheckboxChange = (event) => {
+    //     const { name, checked, value, dataset } = event.target;
+    //     const price = dataset.price;
+    //     setCheckedItems((prev) =>
+    //       checked
+    //         ? [...prev, { name, value, price}]
+    //         : prev.filter((item) => item.name !== name)
+    //     );
+    //   };
+    useEffect(() => {
+        setCheckedItems(() =>
+       [
+        {
+            id: 1,
+            productName: "H-E-B Organics Texas Roots Whole Baby Bella Mushrooms, 8 oz",
+            imageURL:
+              "https://images.heb.com/is/image/HEBGrocery/001854430-1?jpegSize=150&hei=1400&fit=constrain&qlt=75",
+            unitPrice: 3.08,
+            quantity: 1,
+          },
+          {
+            id: 2,
+            productName: "Central Market Organic Super Greens Blend 5oz",
+            imageURL:
+              "https://images.heb.com/is/image/HEBGrocery/001592751-1?jpegSize=150&hei=1400&fit=constrain&qlt=75",
+            unitPrice: 3.62,
+            quantity: 1,
+          },
+          {
+            id: 3,
+            productName: "H-E-B Healthy Marinara Pasta Sauce, 15.5 oz",
+            imageURL:
+              "https://images.heb.com/is/image/HEBGrocery/001535352-1?jpegSize=150&hei=1400&fit=constrain&qlt=75",
+            unitPrice: 2.48,
+            quantity: 1,
+          },
+       ]
+    );
+    })
+
+   function handleGetAmount(amount) {
+        totalAmount += amount;
+        return amount;
+    }
+    
 
   
     useEffect(() => {
@@ -89,10 +153,10 @@ function ModalWindow(props) {
         }
     }
 
-    const sendUserMessage = (aimsg,dish,ingr,inst,reco,sgt) => {
-        // setIsLoading(true);
+    const handleSendShoppingCart = () => {
+        setIsTyping(true);
         setTimeout(() => {
-              setUserMessages((prevMessages) => [
+        setUserMessages((prevMessages) => [
             ...prevMessages,
             {
                 dishName:"",
@@ -100,73 +164,144 @@ function ModalWindow(props) {
                 instructions:[],
                 recommended:[],
                 suggested:[],
-                bot_message: aimsg,
+                bot_message: "",
                 user_message:"",
-              }
-          ]);
-        //   setIsLoading(false);
-        });
-        setTimeout(() => {
-            setUserMessages((prevMessages) => [
-          ...prevMessages,
-            {
-              dishName:dish,
-              ingredients:ingr,
-              instructions:inst,
-              recommended:[],
-              suggested:[],
-              bot_message: "",
-              user_message:"",
-            }
-        ]);
-      //   setIsLoading(false);
-        },2000);
-        setTimeout(() => {
-            setUserMessages((prevMessages) => [
-          ...prevMessages,
-            {
-              dishName:"",
-              ingredients:[],
-              instructions:[],
-              recommended:[],
-              suggested:[],
-              bot_message: "I’ve also prepared some products that will work best for preparing this dish.",
-              user_message:"",
-            }
-        ]);
-      //   setIsLoading(false);
-        },8000);
-         setTimeout(() => {
-            setUserMessages((prevMessages) => [
-          ...prevMessages,
-            {
-              dishName:"",
-              ingredients:[],
-              instructions:[],
-              recommended:reco,
-              suggested:[],
-              bot_message: "Heres my recommended products, you can select items you want to include in your shopping list. Let me know if you’re done shopping or selecting items.",
-              user_message:"",
-            }
-        ]);
-      //   setIsLoading(false);
-        },10000);    
-        setTimeout(() => {
-            setUserMessages((prevMessages) => [
-          ...prevMessages,
-            {
-              dishName:"",
-              ingredients:[],
-              instructions:[],
-              recommended:[],
-              suggested:sgt,
-              bot_message: "Heres my suggested products, you can select items you want to include in your shopping list. Let me know if you’re done shopping or selecting items.",
-              user_message:"",
+                review_message: "",
+                end_message: "Selected items are added to your cart. Thank you for allowing me to assist you in creating a fantastic dish! Here's your shopping cart.",
             },
-        ]);
-      //   setIsLoading(false);
-        },12000);
+            
+            ]);
+            setIsTyping(false);
+         },2000);
+        
+    }
+
+    const sendUserMessage = (aimsg,dish,ingr,inst,recoMsg,reco,sgtMsg,sgt) => {
+        // setIsLoading(true);
+        if (dish != ""){
+            setTimeout(() => {
+                setUserMessages((prevMessages) => [
+                ...prevMessages,
+                {
+                    dishName:"",
+                    ingredients:[],
+                    instructions:[],
+                    recommended:[],
+                    suggested:[],
+                    bot_message: aimsg,
+                    user_message:"",
+                    review_message: "",
+                    end_message: "",
+                }
+            ]);
+            //   setIsLoading(false);
+            });
+            setTimeout(() => {
+                setUserMessages((prevMessages) => [
+            ...prevMessages,
+                {
+                dishName:dish,
+                ingredients:ingr,
+                instructions:inst,
+                recommended:[],
+                suggested:[],
+                bot_message: "",
+                user_message:"",
+                review_message: "",
+                end_message:"",
+                }
+            ]);
+        //   setIsLoading(false);
+            },2000);
+            setTimeout(() => {
+                setUserMessages((prevMessages) => [
+            ...prevMessages,
+                {
+                dishName:"",
+                ingredients:[],
+                instructions:[],
+                recommended:[],
+                suggested:[],
+                bot_message: "I’ve also prepared some products that will work best for preparing this dish.",
+                user_message:"",
+                review_message: "",
+                end_message:"",
+                }
+            ]);
+        //   setIsLoading(false);
+            },8000);
+            setTimeout(() => {
+                setUserMessages((prevMessages) => [
+            ...prevMessages,
+                {
+                dishName:"",
+                ingredients:[],
+                instructions:[],
+                recommended:reco,
+                suggested:[],
+                bot_message: recoMsg + " You can select items you want to include in your shopping list. Let me know if you’re done shopping or selecting items.",
+                user_message:"",
+                review_message: "",
+                end_message:"",
+                }
+            ]);
+        //   setIsLoading(false);
+            },10000);    
+            setTimeout(() => {
+                setUserMessages((prevMessages) => [
+            ...prevMessages,
+                {
+                dishName:"",
+                ingredients:[],
+                instructions:[],
+                recommended:[],
+                suggested:[],
+                bot_message: "I’ve also prepared products that would go best while you’re enjoying your " + dish,
+                user_message:"",
+                review_message: "",
+                end_message: "",
+                },
+            ]);
+        //   setIsLoading(false);
+            },12000);
+            setTimeout(() => {
+                setUserMessages((prevMessages) => [
+            ...prevMessages,
+                {
+                dishName:"",
+                ingredients:[],
+                instructions:[],
+                recommended:[],
+                suggested:sgt,
+                bot_message: sgtMsg + " You can select items you want to include in your shopping list. Let me know if you’re done shopping or selecting items.",
+                user_message:"",
+                review_message: "",
+                end_message:"",
+                },
+            ]);
+        //   setIsLoading(false);
+            },14000);
+        }
+        else{
+            setTimeout(() => {
+                setUserMessages((prevMessages) => [
+                ...prevMessages,
+                {
+                    dishName:"",
+                    ingredients:[],
+                    instructions:[],
+                    recommended:[],
+                    suggested:[],
+                    bot_message: "",
+                    user_message:"",
+                    review_message:aimsg,
+                }
+            ]);
+            //   setIsLoading(false);
+            });
+        }
       };
+
 
     const handleInputChange = (e) => {
         setNewUserMessage(e.target.value);
@@ -183,6 +318,10 @@ function ModalWindow(props) {
         },
     ]);
     };
+
+    const roundToTwoDecimalPlaces = (num) => {
+        return parseFloat(num.toFixed(2));
+      };
 
     const handleKeyPress = (e) => {
         if (e.key === 'Enter') {
@@ -270,12 +409,15 @@ function ModalWindow(props) {
                                                 <input type="checkbox" defaultChecked={true} />
                                             </div>
                                             <div className="w-[65%] mr-[5px]">
-                                                <p><b>1x </b>{data.productName}</p>   
+                                                <p><b>{data.quantity}x </b>{data.productName}</p>   
                                             </div>
-                                            <div className="w-[30%] content-center font-bold mr-[5px]">
-                                                <p>${data.productPrice}
+                                            <div className="w-[30%] content-center mr-[5px]">
+                                               
+                                                <p className=" font-bold">${data.finalPrice}
                                                     {/* {productTotal(data.quantity,data.price)} */}
                                                 </p>
+                                                <p className="text-[9px]">${data.productPrice}</p>
+
                                             </div>
                                         </div>
                                     ))}
@@ -296,33 +438,82 @@ function ModalWindow(props) {
                                                 // value="1"
                                                 data-price={data.productPrice}
                                                 checked={checkedItems.some((checkedItem) => checkedItem.name === data.productName)}
-                                                onChange={handleCheckboxChange}
+                                                // onChange={handleCheckboxChange}
                                                 />
                                             </div>
                                             <div className="w-[70%] mr-[5px]">
-                                                <p><b>1x </b> {data.productName}</p>
+                                                <p><b>{data.quantity}x </b> {data.productName}</p>
                                             </div>
-                                            <div className="w-[20%] content-center font-bold mr-[5px]">
-                                                {/* <p>${productTotal(data.quantity,data.price)}</p> */}
-                                                <p>${data.productPrice}</p>
+                                           
+                                            <div className="w-[20%] content-center mr-[5px]">
+                                                <p className=" font-bold">${data.productPrice}
+                                                    {/* {productTotal(data.quantity,data.price)} */}
+                                                </p>
+                                                <p className="text-[9px]">${data.productPrice}</p>
                                             </div>
                                         </div>
                                     ))}
 
-                                    <div>
+                                    {/* <div>
                                         <h3>Checked Items:</h3>
                                         <ul>
                                         {checkedItems.map((item) => (
                                             <li>{item.name}x{item.price}</li>
                                         ))}
                                         </ul>
-                                    </div>
+                                    </div> */}
                                    
                                 </div>
                             </div>
-                            : ''
-                            
-                            
+                            : ''||
+                            msg.review_message !== "" ?
+                               <div className=" mt-[5px] mr-[15%] max-w-[80%] flex">
+                                   <img className='img w-auto h-[30px] content-end ml-[3%]' src="src/assets/img/maia-icon.png" alt="MAIA" />
+                                   <div className="bg-[#e6e6e6] p-[10px] h-fit ml-[2%] rounded-md text-[#000000] text-[13px] font-sans">
+                                       
+                                   <p className="text-sm mb-[15px]">{ msg.review_message}</p>
+                                       {checkedItems.map((item) => (
+                                           
+                                           <div className="bg-white w-[100%] rounded-sm mt-[5px] flex p-[5px]">
+                                               <div className="w-[10%] mr-[5%] content-center">
+                                                   <input type="checkbox" defaultChecked={true} />
+                                               </div>
+                                               <div className="w-[70%] mr-[5px]">
+                                                   <p><b>{item.quantity}x</b> {item.productName}</p>
+                                               </div>
+                                               <div className="w-[20%] content-center font-bold mr-[5px]">
+                                               <p>{handleGetAmount(item.unitPrice)}</p>
+                                               </div>
+                                           </div>
+                                       ))}
+
+                                       <div className="content-center">
+                                           <button 
+                                           className="bg-[#d5281d] border-1 text-[#FFF9ED] text-sm hover:bg-[#811911] hover:border-[#811911] w-[90%] m-[10px] rounded-none"
+                                           onClick={() => {handleAddToCart(checkedItems),handleSendShoppingCart()}}>Add to cart &nbsp; ${totalAmount}</button> 
+                                       </div>
+                                       
+                                   </div>
+                               </div>
+                                : '' ||
+                                msg.end_message !== "" ?
+                                   <div className=" mt-[5px] mr-[15%] max-w-[80%] flex">
+                                       <img className='img w-auto h-[30px] content-end ml-[3%]' src="src/assets/img/maia-icon.png" alt="MAIA" />
+                                       <div className="bg-[#e6e6e6] p-[10px] h-fit ml-[2%] rounded-md text-[#000000] text-[13px] font-sans">
+                                           
+                                       <p className="text-sm mb-[15px]">{ msg.end_message}</p>
+    
+                                           <div className="content-center">
+                                           {/* <Link to="/shoppingcart"> */}
+                                               <button 
+                                               className="bg-[#d5281d] border-1 text-[#FFF9ED] text-sm hover:bg-[#811911] hover:border-[#811911] w-[90%] m-[10px] rounded-none"
+                                               onClick={goToShoppingCart}>View Shopping Cart</button> 
+                                               {/* </Link> */}
+                                           </div>
+                                           
+                                       </div>
+                                   </div>
+                                    : ''
                             }
                             {/* </div>
                         ))} */}

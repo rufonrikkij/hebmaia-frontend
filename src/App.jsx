@@ -5,6 +5,7 @@ import Header from "./components/Header";
 import './assets/Style.css'
 import { BrowserRouter,Routes,Route} from "react-router-dom"
 import Home from "./pages/Home";
+import Cart from "./pages/Cart";
 import '../server'
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route index element={<Home/>} />
+        <Route path="/shoppingcart" element={<Cart/>} />
       </Routes>
     </BrowserRouter>
   </div>

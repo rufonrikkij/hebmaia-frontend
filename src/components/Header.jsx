@@ -39,7 +39,7 @@ export default function Header(){
                 <ul className={`md:flex ml-20 cursor-pointer pl-9 md:pl-0 md:items-center md:pb-0 pd-12 md:z-auto z-[-1] left-0 w-full transition-all duration-500 ease-in `}>
                     <li><p className="font-sans ml-5 mr-5 font text-xl text-[#000000] font-normal">ABOUT</p></li>
                     <li><p className="font-sans ml-5 mr-5 font text-xl text-[#000000] font-normal">SERVICES</p></li>
-                    <li><p className="font-sans ml-5 mr-5 font text-xl text-[#000000] font-normal">SHOPPING CART</p></li>
+                    <li><Link to="/shoppingcart"><p className="font-sans ml-5 mr-5 font text-xl text-[#000000] font-normal">SHOPPING CART</p></Link></li>
                 </ul>
             </div>
         </div>
