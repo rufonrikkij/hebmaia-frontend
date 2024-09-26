@@ -538,9 +538,8 @@ function ModalWindow(props) {
                     </div>
                   ))}
 
-                  <div>
+                  {/* <div>
                     <h5 className="mt-2">Checked Items:</h5>
-                    {/* <Card><Card.body> */}
                     {checkedItems.map((item, index) => (
                       <div key={index}>
                         {item.productName || item.name}$
@@ -554,15 +553,17 @@ function ModalWindow(props) {
                         />
                       </div>
                     ))}
-                  </div>
+                  </div> */}
                   {/* <div>
-                                        <h3>Checked Items:</h3>
-                                        <ul>
-                                        {checkedItems.map((item) => (
-                                            <li>{item.name}x{item.price}</li>
-                                        ))}
-                                        </ul>
-                                    </div> */}
+                    <h3>Checked Items:</h3>
+                    <ul>
+                      {checkedItems.map((item) => (
+                        <li>
+                          {item.name}x{item.price}
+                        </li>
+                      ))}
+                    </ul>
+                  </div> */}
                 </div>
               </div>
             ) : "" || msg.review_message !== "" ? (
