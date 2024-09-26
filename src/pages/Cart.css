@@ -16,7 +16,7 @@
   .right-sidebar-grid {
     display:grid;
     grid-template-areas:
-        /* 'header' */
+        'header'
         'main-content'
         'right-sidebar'
         'footer';
@@ -28,10 +28,10 @@
 }
 
 /* assign columns to grid areas */
-/* .right-sidebar-grid > .header {
+.right-sidebar-grid > .header {
     grid-area:header;
     background:#f97171;
-} */
+}
 .right-sidebar-grid > .main-content {
     grid-area:main-content;
     background:#fff;

@@ -19,7 +19,11 @@ function ModalWindow(props) {
   const [checkedItems, setCheckedItems] = useState([]);
   const [reviewChecked, setReviewChedked] = useState([]);
   const { handleAddToCart } = useCartContext();
-  let totalAmount = 0;
+  // let totalAmount = 0;
+  const totalAmount = checkedItems.reduce(
+    (total, item) => total + Number(item.finalPrice),
+    0
+  );
 
   const aiChat = async (newmsg) => {
     setTimeout(() => {
@@ -111,6 +115,15 @@ function ModalWindow(props) {
         : [...prevSelectedItems, item]
     );
   };
+  // const handleCheckedItem = (item) => {
+  //   setCheckedItems((prevSelectedItems) => {
+  //     if (prevSelectedItems.some((i) => i.id === item.productID)) {
+  //       return prevSelectedItems.filter((i) => i.id !== item.productID);
+  //     } else {
+  //       return [...prevSelectedItems, item];
+  //     }
+  //   });
+  // };
 
   // useEffect(() => {
   //     userMessages.map(fields => {
@@ -157,10 +170,10 @@ function ModalWindow(props) {
   //     ]);
   //   });
 
-  function handleGetAmount(amount) {
-    totalAmount += amount;
-    return amount;
-  }
+  // function handleGetAmount(amount) {
+  //   totalAmount += amount;
+  //   return amount;
+  // }
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -484,16 +497,17 @@ function ModalWindow(props) {
                       </div>
                       <div className="w-[65%] mr-[5px]">
                         <p>
-                          <b>{data.quantity}x </b>
+                          <b>{data.quantity} x </b>
                           {data.productName}
                         </p>
                       </div>
-                      <div className="w-[30%] content-center mr-[5px]">
+                      <div className="w-[30%] content-center mr-[5px] text-right">
                         <p className=" font-bold">
-                          ${data.finalPrice}
-                          {/* {productTotal(data.quantity,data.price)} */}
+                          ${Number(data.finalPrice).toFixed(2)}
                         </p>
-                        <p className="text-[9px]">${data.productPrice}</p>
+                        <p className="text-[10px]">
+                          ${Number(data.productPrice).toFixed(2)} ea.
+                        </p>
                       </div>
                     </div>
                   ))}
@@ -513,32 +527,31 @@ function ModalWindow(props) {
                       key={index}
                       className="bg-white rounded-sm w-[100%] mt-[5px] flex p-[5px]"
                     >
-                      <div className="w-[10%] mr-[5%] content-center">
+                      <div className="flex">
                         <input
+                          className="w-[10%] mr-[5%] content-center"
                           type="checkbox"
                           name={data.productName}
                           data-price={data.productPrice}
                           checked={checkedItems.includes(data)}
                           onChange={() => handleCheckedItem(data)}
                         />
-                      </div>
-                      <div className="w-[70%] mr-[5px]">
-                        <p>
+                        <p className="w-[70%] mr-[5px]">
                           <b>{data.quantity}x </b> {data.productName}
                         </p>
                       </div>
 
                       <div className="w-[20%] content-center mr-[5px]">
-                        <p className=" font-bold">
-                          ${data.productPrice}
-                          {/* {productTotal(data.quantity,data.price)} */}
+                        <p className="font-bold">
+                          {isNaN(Number(data.productPrice))
+                            ? data.productPrice
+                            : `$${parseFloat(data.productPrice).toFixed(2)}`}
                         </p>
-                        <p className="text-[9px]">${data.productPrice}</p>
                       </div>
                     </div>
                   ))}
 
-                  {/* <div>
+                  <div>
                     <h5 className="mt-2">Checked Items:</h5>
                     {checkedItems.map((item, index) => (
                       <div key={index}>
@@ -553,7 +566,7 @@ function ModalWindow(props) {
                         />
                       </div>
                     ))}
-                  </div> */}
+                  </div>
                   {/* <div>
                     <h3>Checked Items:</h3>
                     <ul>
@@ -575,6 +588,7 @@ function ModalWindow(props) {
                 />
                 <div className="bg-[#e6e6e6] p-[10px] h-fit ml-[2%] rounded-md text-[#000000] text-[13px] font-sans">
                   <p className="text-sm mb-[15px]">{msg.review_message}</p>
+
                   {checkedItems.map((item) => (
                     <div className="bg-white w-[100%] rounded-sm mt-[5px] flex p-[5px]">
                       <div className="w-[10%] mr-[5%] content-center">
@@ -585,12 +599,16 @@ function ModalWindow(props) {
                           <b>{item.quantity}x</b> {item.productName}
                         </p>
                       </div>
-                      <div className="w-[20%] content-center font-bold mr-[5px]">
-                        <p>{handleGetAmount(item.unitPrice)}</p>
+                      <div className="w-[30%] content-center mr-[5px] text-right">
+                        <p className=" font-bold">
+                          ${Number(item.finalPrice).toFixed(2)}
+                        </p>
+                        <p className="text-[10px]">
+                          ${Number(item.productPrice).toFixed(2)} ea.
+                        </p>
                       </div>
                     </div>
                   ))}
-
                   <div className="content-center">
                     <button
                       className="bg-[#d5281d] border-1 text-[#FFF9ED] text-sm hover:bg-[#811911] hover:border-[#811911] w-[90%] m-[10px] rounded-none"
@@ -598,7 +616,7 @@ function ModalWindow(props) {
                         handleAddToCart(checkedItems), handleSendShoppingCart();
                       }}
                     >
-                      Add to cart &nbsp; ${totalAmount}
+                      Add to cart &nbsp; ${totalAmount.toFixed(2)}
                     </button>
                   </div>
                 </div>
