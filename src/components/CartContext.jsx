@@ -21,28 +21,22 @@ export const CartContextProvider = ({ children }) => {
 
     newItems.forEach((newItem) => {
       const existingItemIndex = updatedCart.findIndex(
-        (item) => item.id === newItem.id
+        (item) => item.productID === newItem.productID
       );
 
       if (existingItemIndex !== -1) {
         // Item already exists, update the quantity
-        updatedCart[existingItemIndex].qty += newItem.qty;
+        updatedCart[existingItemIndex].quantity += newItem.quantity;
       } else {
         // Item does not exist, add it to the cart
         updatedCart.push(newItem);
       }
     });
-
     setCart(updatedCart);
   };
 
-
-// const handleAddToCart = (imageURL,productName,unitPrice,quantity) => {
-//     setCart([...cart, {imageURL,productName,unitPrice,quantity}]);
-//   };
-
   const handleDeleteItem = (itemID) => {
-    const updatedCart = cart.filter((item) => item.id !== itemID);
+    const updatedCart = cart.filter((item) => item.productID !== itemID);
     setCart(updatedCart);
   };
 
@@ -50,10 +44,10 @@ export const CartContextProvider = ({ children }) => {
     setCart([]);
   };
 
-  const updateCartQuantity = (itemId, newQuantity) => {
+  const updateCartQuantity = (itemID, newQuantity) => {
     setCart((prevCart) =>
       prevCart.map((item) =>
-        item.id === itemId ? { ...item, qty: newQuantity } : item
+        item.productID === itemID ? { ...item, quantity: newQuantity } : item
       )
     );
   };

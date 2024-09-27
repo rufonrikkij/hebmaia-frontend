@@ -9,49 +9,24 @@ const Cart = () => {
   const { cart, handleDeleteItem, handleDeleteAll, updateCartQuantity } =
     useCartContext();
 
-  // const [quantity, setQuantity] = useState(cart.map(() => 1));
-
-  // const increment = (index) => {
-  //   const newQuantity = [...quantity];
-  //   newQuantity[index] += 1;
-  //   setQuantity(newQuantity);
-  // };
-
-  // const decrement = (index) => {
-  //   const newQuantity = [...quantity];
-  //   if (newQuantity[index] > 1) {
-  //     newQuantity[index] -= 1;
-  //   }
-  //   setQuantity(newQuantity);
-  // };
-
-  // const handleDelete = (index) => {
-  //   const newQuantity = [...quantity];
-  //   newQuantity[index] = 1;
-  //   setQuantity(newQuantity);
-  // };
-
-  // //overall count of item quantity
-  // const totalQuantity = quantity.reduce((acc, curr) => acc + curr, 0);
-
-  // //overall subtotal
-  // const totalPrice = cart
-  //   .reduce((acc, item, index) => {
-  //     return acc + item.unitPrice * quantity[index];
-  //   }, 0)
-  //   .toFixed(2);
-
   const [quantity, setQuantity] = useState(cart.map((item) => item.quantity));
 
   useEffect(() => {
-    setQuantity(cart.map((item) => item.qty));
+    setQuantity(cart.map((item) => item.quantity));
   }, [cart]);
 
+  // useEffect(() => {
+  //   cart.forEach((item, index) => {
+  //     updateCartQuantity(item.productID, quantity[index]);
+  //   });
+  // }, [quantity]);
   useEffect(() => {
     cart.forEach((item, index) => {
-      updateCartQuantity(item.id, quantity[index]);
+      if (item.quantity !== quantity[index]) {
+        updateCartQuantity(item.productID, quantity[index]);
+      }
     });
-  }, [quantity]);
+  }, [quantity, cart, updateCartQuantity]);
 
   const increment = (index) => {
     const newQuantity = [...quantity];
@@ -72,7 +47,7 @@ const Cart = () => {
     newQuantity.splice(index, 1);
     setQuantity(newQuantity);
 
-    handleDeleteItem(cart[index].id);
+    handleDeleteItem(cart[index].productID);
   };
 
   const handleDeleteAllItems = () => {
@@ -86,15 +61,15 @@ const Cart = () => {
   // overall subtotal
   const totalPrice = cart
     .reduce((acc, item, index) => {
-      return acc + item.unitPrice * quantity[index];
+      return acc + item.productPrice * quantity[index];
     }, 0)
     .toFixed(2);
 
   return (
     <>
-      <div className="px-5 mt-20 ">
+      <header className="text-3xl font-bold">Review cart</header>
+      <div className=" mt-20 ">
         <div class="right-sidebar-grid">
-          <p className="text-3xl font-bold">Review cart</p>
           {totalQuantity === 0 ? (
             <main class="main-content flex justify-center items-center h-[60vh]">
               <div className="text-center">
@@ -116,28 +91,31 @@ const Cart = () => {
                   <div key={index}>
                     <div className="row">
                       {/* delete item */}
-                      <div className="col flex items-center">
+                      <div className="col-sm-1 flex items-center">
                         <button
                           className=""
                           onClick={() => handleDelete(index)}
                         >
                           <i className="bi bi-x-circle"></i>
                         </button>
-
-                        <img src={item.imageURL} className="w-20 ml-auto" />
                       </div>
+                      <div className="col-sm-1">
+                        <img src={item.imageUrl} className="w-20 mr-auto" />
+                      </div>
+
                       <div className="col-sm-10">
                         <div className="row">
                           <div className="col-sm-9">
-                            <h5>{item.productName}</h5>
+                            <p className="text-base">{item.productName}</p>
                           </div>
                           <div className="col-sm-3">
                             <h6 className="text-right font-bold text-xl">
-                              ${(item.unitPrice * quantity[index]).toFixed(2)}
+                              $
+                              {(item.productPrice * quantity[index]).toFixed(2)}
                             </h6>
                             {quantity[index] > 1 && (
                               <h6 className="text-right text-sm">
-                                ${item.unitPrice.toFixed(2)} / each
+                                ${item.productPrice.toFixed(2)} / each
                               </h6>
                             )}
                           </div>
@@ -167,10 +145,10 @@ const Cart = () => {
                             </button>
                           )}
                           <input
-                            type="number"
                             value={quantity[index]}
-                            className="border-t border-b border-gray-300 text-center w-12 font-bold font"
+                            className="border-t border-b border-gray-300 text-center w-12 font-bold font align-middle"
                             style={{ textAlign: "center" }}
+                            readOnly
                           />
                           <button
                             className="bg-gray-300 text-black px-2 py-1 rounded-r-full w-10 font-bold"
