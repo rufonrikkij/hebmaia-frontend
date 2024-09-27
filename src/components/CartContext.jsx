@@ -12,6 +12,18 @@ export const CartContextProvider = ({ children }) => {
     return savedCartItems ? JSON.parse(savedCartItems) : [];
   });
 
+  // const [userMessages, setUserMessages] = useState(() => {
+  //   // Load from local storage on initial render
+  //   return JSON.parse(localStorage.getItem('messages')) || [];
+  // });
+
+  // useEffect(() => {
+  //   // Save to local storage whenever messages change
+  //   localStorage.setItem('messages', JSON.stringify(userMessages));
+  // }, [userMessages]);
+
+  const [userMessages, setUserMessages] = useState([]);
+
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
@@ -66,6 +78,8 @@ export const CartContextProvider = ({ children }) => {
         handleDeleteAll,
         handleDeleteItem,
         updateCartQuantity,
+        userMessages,
+        setUserMessages,
       }}
     >
       {children}

@@ -14,13 +14,14 @@ import { CardBody } from "react-bootstrap";
 function ModalWindow(props) {
   const [isTyping, setIsTyping] = useState(false);
   const chatContainerRef = useRef(null);
-  const [userMessages, setUserMessages] = useState([]);
+//   const [userMessages, setUserMessages] = useState([]);
   const [newUserMessage, setNewUserMessage] = useState("");
   const [checkedItems, setCheckedItems] = useState([]);
   const [reviewChecked, setReviewChedked] = useState([]);
   const { handleAddToCart } = useCartContext();
   let totalAmount = 0;
 
+  //call AI API
   const aiChat = async (newmsg) => {
     setTimeout(() => {
       setIsTyping(true);
@@ -75,26 +76,33 @@ function ModalWindow(props) {
   };
 
   const navigate = useNavigate();
+  const { userMessages, setUserMessages } = useCartContext();
 
   const goToShoppingCart = () => {
+    
+    // setMessages([...messages, userMessages]);
     navigate("/shoppingcart");
     // window.open('http://localhost:5173/shoppingcart', '_blank', 'noopener,noreferrer');
   };
 
-  //   useEffect(() => {
-  //     const initialCheckedItems = userMessages.flatMap((fields) => {
-  //       const recommendedProducts =
-  //         fields.recommendedProductsResponse?.recommendedProducts || [];
-  //       const suggestedProducts =
-  //         fields.suggestedProductsResponse?.suggestedProducts || [];
-  //       return [...recommendedProducts, ...suggestedProducts].filter(
-  //         (item) => item.checked
-  //       );
-  //     });
-  //     console.log(initialCheckedItems);
-  //     setCheckedItems("check",initialCheckedItems);
-  //   }, [userMessages]);
+  //initial message of maia
+  useEffect(() => {
+    setUserMessages((prevChatLog) => [
+      ...prevChatLog,
+      {
+        dishName: "",
+        ingredients: [],
+        instructions: [],
+        recommended: [],
+        suggested: [],
+        bot_message: "Hi I’m HEB's MAIA but you can call me Maia, let’s cook delicious meals together! ",
+        user_message: "",
+        review_message:"",
+      }
+    ]);
+  }, []);
 
+  //get already checked items
   useEffect(() => {
     const initialCheckedItems = userMessages.flatMap((fields) =>
       [...fields.suggested, ...fields.recommended].filter(
@@ -104,6 +112,7 @@ function ModalWindow(props) {
     setCheckedItems(initialCheckedItems);
   }, [userMessages]);
 
+  //handle check items
   const handleCheckedItem = (item) => {
     setCheckedItems((prevSelectedItems) =>
       prevSelectedItems.includes(item)
@@ -112,63 +121,22 @@ function ModalWindow(props) {
     );
   };
 
-  // useEffect(() => {
-  //     userMessages.map(fields => {
-  //         setCheckedItems(fields.suggested);
-  //     })
-  //   }, []);
-
-  // const handleCheckboxChange = (event) => {
-  //     const { name, checked, value, dataset } = event.target;
-  //     const price = dataset.price;
-  //     setCheckedItems((prev) =>
-  //       checked
-  //         ? [...prev, { name, value, price}]
-  //         : prev.filter((item) => item.name !== name)
-  //     );
-  //   };
-  //   useEffect(() => {
-  //     setCheckedItems(() => [
-  //       {
-  //         id: 1,
-  //         productName:
-  //           "H-E-B Organics Texas Roots Whole Baby Bella Mushrooms, 8 oz",
-  //         imageURL:
-  //           "https://images.heb.com/is/image/HEBGrocery/001854430-1?jpegSize=150&hei=1400&fit=constrain&qlt=75",
-  //         unitPrice: 3.08,
-  //         quantity: 1,
-  //       },
-  //       {
-  //         id: 2,
-  //         productName: "Central Market Organic Super Greens Blend 5oz",
-  //         imageURL:
-  //           "https://images.heb.com/is/image/HEBGrocery/001592751-1?jpegSize=150&hei=1400&fit=constrain&qlt=75",
-  //         unitPrice: 3.62,
-  //         quantity: 1,
-  //       },
-  //       {
-  //         id: 3,
-  //         productName: "H-E-B Healthy Marinara Pasta Sauce, 15.5 oz",
-  //         imageURL:
-  //           "https://images.heb.com/is/image/HEBGrocery/001535352-1?jpegSize=150&hei=1400&fit=constrain&qlt=75",
-  //         unitPrice: 2.48,
-  //         quantity: 1,
-  //       },
-  //     ]);
-  //   });
-
+  //handle the total amount computation
   function handleGetAmount(amount) {
-    totalAmount += amount;
+    totalAmount += amount
     return amount;
   }
 
+  //container of messages
   useEffect(() => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop =
-        chatContainerRef.current.scrollHeight;
+    //   chatContainerRef.current.scrollTop =
+    //     chatContainerRef.current.scrollHeight;
+    chatContainerRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [userMessages]);
 
+  //handle new message from user
   const handleSendMessage = async () => {
     if (newUserMessage.trim()) {
       setUserMessages([
@@ -181,6 +149,7 @@ function ModalWindow(props) {
           suggested: [],
           bot_message: "",
           user_message: newUserMessage,
+          review_message:"",
         },
       ]);
       setNewUserMessage("");
@@ -188,7 +157,12 @@ function ModalWindow(props) {
       aiChat(newUserMessage);
     }
   };
+  const handleInputChange = (e) => {
+    setNewUserMessage(e.target.value);
+    // setShowSuggestions(false);
+  };
 
+  //handle redirect user to shopping cart
   const handleSendShoppingCart = () => {
     setIsTyping(true);
     setTimeout(() => {
@@ -203,14 +177,14 @@ function ModalWindow(props) {
           bot_message: "",
           user_message: "",
           review_message: "",
-          end_message:
-            "Selected items are added to your cart. Thank you for allowing me to assist you in creating a fantastic dish! Here's your shopping cart.",
+          end_message: "Selected items are added to your cart. Thank you for allowing me to assist you in creating a fantastic dish! Here's your shopping cart.",
         },
       ]);
       setIsTyping(false);
     }, 2000);
   };
 
+  //handle ai message/responses
   const sendUserMessage = (
     aimsg,
     dish,
@@ -223,23 +197,43 @@ function ModalWindow(props) {
   ) => {
     // setIsLoading(true);
     if (dish != "") {
-      setTimeout(() => {
-        setUserMessages((prevMessages) => [
-          ...prevMessages,
-          {
-            dishName: "",
-            ingredients: [],
-            instructions: [],
-            recommended: [],
-            suggested: [],
-            bot_message: aimsg,
-            user_message: "",
-            review_message: "",
-            end_message: "",
-          },
-        ]);
-        //   setIsLoading(false);
-      });
+        if(aimsg == "Your generated message"){
+            setTimeout(() => {
+                setUserMessages((prevMessages) => [
+                ...prevMessages,
+                {
+                    dishName: "",
+                    ingredients: [],
+                    instructions: [],
+                    recommended: [],
+                    suggested: [],
+                    bot_message: "Here is the recipe for your " + dish,
+                    user_message: "",
+                    review_message: "",
+                    end_message: "",
+                },
+                ]);
+                //   setIsLoading(false);
+            });
+        }else{
+            setTimeout(() => {
+                setUserMessages((prevMessages) => [
+                ...prevMessages,
+                {
+                    dishName: "",
+                    ingredients: [],
+                    instructions: [],
+                    recommended: [],
+                    suggested: [],
+                    bot_message: aimsg,
+                    user_message: "",
+                    review_message: "",
+                    end_message: "",
+                },
+                ]);
+                //   setIsLoading(false);
+            });
+        }
       setTimeout(() => {
         setUserMessages((prevMessages) => [
           ...prevMessages,
@@ -332,7 +326,7 @@ function ModalWindow(props) {
         ]);
         //   setIsLoading(false);
       }, 14000);
-    } else {
+    } else if (aimsg == "I have prepared your list of items, ready to be added to your cart. You can add them by clicking 'Add To Cart.'"){
       setTimeout(() => {
         setUserMessages((prevMessages) => [
           ...prevMessages,
@@ -349,35 +343,42 @@ function ModalWindow(props) {
         ]);
         //   setIsLoading(false);
       });
+    } else{
+        setTimeout(() => {
+            setUserMessages((prevMessages) => [
+              ...prevMessages,
+              {
+                dishName: "",
+                ingredients: [],
+                instructions: [],
+                recommended: [],
+                suggested: [],
+                bot_message: aimsg,
+                user_message: "",
+                review_message: "",
+              },
+            ]);
+            //   setIsLoading(false);
+          });
     }
   };
 
-  const handleInputChange = (e) => {
-    setNewUserMessage(e.target.value);
-    // setShowSuggestions(false);
-  };
-
+  //handle new chat
   const handleNewChat = () => {
     setUserMessages([
       {
-        // sender: "Su-San",
-        type: "bot",
-        text: "test this bot new message",
-        // timestamp: new Date().toLocaleTimeString(),
+        dishName: "",
+        ingredients: [],
+        instructions: [],
+        recommended: [],
+        suggested: [],
+        bot_message: "Hi I’m HEB's MAIA but you can call me Maia, let’s cook delicious meals together! ",
+        user_message: "",
+        review_message:"",
       },
     ]);
   };
 
-  const roundToTwoDecimalPlaces = (num) => {
-    return parseFloat(num.toFixed(2));
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      //   alert('Enter pressed')
-      handleSendMessage;
-    }
-  };
   // returning display
   return (
     <div
@@ -386,16 +387,7 @@ function ModalWindow(props) {
         ...{ opacity: props.visible ? "1" : "0" },
       }}
     >
-      {/* <span>Hello there!</span> */}
-
-      {/*jabdia */}
       <div className="bg-[#d5281d] flex">
-        {/* <div className="md:px-10 py-5 px-7 md:flex justify-between items-center bg-[#ffffff]">
-                    <div className="flex cursor-pointer items-center">
-                        <p className="font-sans font text-2xl text-[#d5281d] font-bold">HEB</p>
-                        <p className="font-sans font text-2xl text-[#000000] font-bold">.RAIA</p>
-                    </div>
-                </div> */}
         <img
           className="img w-auto h-[50px]"
           src="src/assets/img/chat-icon.png"
@@ -410,34 +402,35 @@ function ModalWindow(props) {
         className="bg-white overflow-y-scroll h-[77%] p-[10px]"
         ref={chatContainerRef}
       >
-        {/* paste here loop for messages */}
+       
         {userMessages.map((msg, index) => (
           <div key={index}>
-            {/* {msg.outputResponse.map((content,index) =>(
-                            <div key={index}> */}
             {msg.user_message !== "" ? (
               // user normal message
-              <div className="bg-[#d5281d] p-[10px] h-fit ml-[45%] rounded-md mt-[5px] mr-[5%] max-w-[50%] text-[#ffffff] text-[13px] font-sans">
-                <p>{msg.user_message}</p>
-              </div>
+            //   <div className="bg-[#d5281d] p-[10px] h-fit ml-[45%] rounded-md mt-[5px] mr-[5%] max-w-[50%] text-[#ffffff] text-[13px] font-sans">
+            //     <p>{msg.user_message}</p>
+            //   </div>
+                <div className="bg-[#d5281d] p-[10px] h-fit ml-[45%] rounded-md mt-[5px] mr-[5%] max-w-[50%] text-[#ffffff] text-[13px] font-sans">
+                    <p className="mb-[0px]">{msg.user_message}</p>
+                </div>
             ) : "" ||
               (msg.bot_message !== "" &&
                 msg.recommended.length === 0 &&
                 msg.suggested.length === 0) ? (
               // bot normal message
 
-              <div className=" mt-[5px] mr-[15%] max-w-[80%] flex">
+              <div className=" mt-[5px] mr-[15%] max-w-[90%] flex">
                 <img
                   className="img w-auto h-[30px] flex flex-col ml-[3%]"
                   src="src/assets/img/maia-icon.png"
                   alt="MAIA"
                 />
                 <div className="bg-[#e6e6e6] p-[10px] h-fit ml-[2%] rounded-md text-[#000000] text-[13px] font-sans">
-                  <p>{msg.bot_message}</p>
+                  <p className="mb-[0px]">{msg.bot_message}</p>
                 </div>
               </div>
             ) : "" || msg.dishName !== "" ? (
-              <div className=" mt-[5px] mr-[15%] max-w-[80%] flex">
+              <div className=" mt-[5px] mr-[15%] max-w-[90%] flex">
                 <img
                   className="img w-auto h-[30px] flex flex-col ml-[3%]"
                   src="src/assets/img/maia-icon.png"
@@ -445,16 +438,16 @@ function ModalWindow(props) {
                 />
 
                 <div className="bg-[#e6e6e6] p-[10px] h-fit ml-[2%] rounded-md text-[#000000] text-[13px] font-sans">
-                  <p className="text-sm uppercase font-bold">{msg.dishName}</p>
-                  <p className="font-semibold mt-[10px]">Ingredients</p>
-                  <ul className="list-disc ml-[15px]">
+                  <p className="text-sm uppercase font-bold mb-[0px]">{msg.dishName}</p>
+                  <p className="font-semibold mt-[10px] mb-[0px]">Ingredients</p>
+                  <ul className="list-disc ml-[-10px] mt-[10px]">
                     {/* {console.log(msg.ingredients)} */}
                     {msg.ingredients.map((ingList, index) => (
                       <li key={index}>{ingList}</li>
                     ))}
                   </ul>
-                  <p className="font-semibold mt-[10px]">Instructions</p>
-                  <ol className="list-decimal">
+                  <p className="font-semibold mt-[10px] mb-[0px]">Instructions</p>
+                  <ol className="list-decimal ml-[-10px] mt-[10px]">
                     {msg.instructions.map((insList, index) => (
                       <li key={index}>{insList}</li>
                     ))}
@@ -462,7 +455,7 @@ function ModalWindow(props) {
                 </div>
               </div>
             ) : "" || msg.recommended.length > 0 ? (
-              <div className=" mt-[5px] mr-[15%] max-w-[80%] flex">
+              <div className=" mt-[5px] mr-[15%] max-w-[90%] flex">
                 <img
                   className="img w-auto h-[30px] content-end ml-[3%]"
                   src="src/assets/img/maia-icon.png"
@@ -482,25 +475,25 @@ function ModalWindow(props) {
                           onChange={() => handleCheckedItem(data)}
                         />
                       </div>
-                      <div className="w-[65%] mr-[5px]">
-                        <p>
-                          <b>{data.quantity}x </b>
+                      <div className="w-[75%] mr-[5px]">
+                        <p className="mb-[0px]">
+                          <b className="mb-[0px]">{data.quantity}x </b>
                           {data.productName}
                         </p>
                       </div>
-                      <div className="w-[30%] content-center mr-[5px]">
-                        <p className=" font-bold">
+                      <div className="w-[30%] content-center justify-center">
+                        <p className="font-bold mb-[0px]">
                           ${data.finalPrice}
                           {/* {productTotal(data.quantity,data.price)} */}
                         </p>
-                        <p className="text-[9px]">${data.productPrice}</p>
+                        <p className="text-[9px] mb-[0px]">${data.productPrice}</p>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
             ) : "" || msg.suggested.length > 0 ? (
-              <div className=" mt-[5px] mr-[15%] max-w-[80%] flex">
+              <div className=" mt-[5px] mr-[15%] max-w-[90%] flex">
                 <img
                   className="img w-auto h-[30px] content-end ml-[3%]"
                   src="src/assets/img/maia-icon.png"
@@ -523,50 +516,26 @@ function ModalWindow(props) {
                         />
                       </div>
                       <div className="w-[70%] mr-[5px]">
-                        <p>
-                          <b>{data.quantity}x </b> {data.productName}
+                        <p className="mb-[0px]">
+                          <b className="mb-[0px]">{data.quantity}x </b> {data.productName}
                         </p>
                       </div>
 
                       <div className="w-[20%] content-center mr-[5px]">
-                        <p className=" font-bold">
+                        <p className=" font-bold mb-[0px]">
                           ${data.productPrice}
                           {/* {productTotal(data.quantity,data.price)} */}
                         </p>
-                        <p className="text-[9px]">${data.productPrice}</p>
+                        <p className="text-[9px] mb-[0px]">${data.productPrice}</p>
                       </div>
                     </div>
                   ))}
 
-                  <div>
-                    <h5 className="mt-2">Checked Items:</h5>
-                    {/* <Card><Card.body> */}
-                    {checkedItems.map((item, index) => (
-                      <div key={index}>
-                        {item.productName || item.name}$
-                        {item.productPrice || item.price}
-                        <hr
-                          className="my-1"
-                          style={{
-                            border: "none",
-                            borderTop: "1px solid black",
-                          }}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                  {/* <div>
-                                        <h3>Checked Items:</h3>
-                                        <ul>
-                                        {checkedItems.map((item) => (
-                                            <li>{item.name}x{item.price}</li>
-                                        ))}
-                                        </ul>
-                                    </div> */}
+                  
                 </div>
               </div>
             ) : "" || msg.review_message !== "" ? (
-              <div className=" mt-[5px] mr-[15%] max-w-[80%] flex">
+              <div className=" mt-[5px] mr-[15%] max-w-[90%] flex">
                 <img
                   className="img w-auto h-[30px] content-end ml-[3%]"
                   src="src/assets/img/maia-icon.png"
@@ -580,19 +549,19 @@ function ModalWindow(props) {
                         <input type="checkbox" defaultChecked={true} />
                       </div>
                       <div className="w-[70%] mr-[5px]">
-                        <p>
-                          <b>{item.quantity}x</b> {item.productName}
+                        <p className="mb-[0px]">
+                          <b className="mb-[0px]">{item.quantity}x</b> {item.productName}
                         </p>
                       </div>
                       <div className="w-[20%] content-center font-bold mr-[5px]">
-                        <p>{handleGetAmount(item.unitPrice)}</p>
+                        <p className="mb-[0px]">${handleGetAmount(item.finalPrice)}</p>
                       </div>
                     </div>
                   ))}
 
                   <div className="content-center">
                     <button
-                      className="bg-[#d5281d] border-1 text-[#FFF9ED] text-sm hover:bg-[#811911] hover:border-[#811911] w-[90%] m-[10px] rounded-none"
+                      className="bg-[#d5281d] border-1 text-[#FFF9ED] text-sm hover:bg-[#811911] hover:border-[#811911] w-[90%] m-[10px] rounded-none mb-[0px]"
                       onClick={() => {
                         handleAddToCart(checkedItems), handleSendShoppingCart();
                       }}
@@ -603,7 +572,7 @@ function ModalWindow(props) {
                 </div>
               </div>
             ) : "" || msg.end_message !== "" ? (
-              <div className=" mt-[5px] mr-[15%] max-w-[80%] flex">
+              <div className=" mt-[5px] mr-[15%] max-w-[90%] flex">
                 <img
                   className="img w-auto h-[30px] content-end ml-[3%]"
                   src="src/assets/img/maia-icon.png"
@@ -615,7 +584,7 @@ function ModalWindow(props) {
                   <div className="content-center">
                     {/* <Link to="/shoppingcart"> */}
                     <button
-                      className="bg-[#d5281d] border-1 text-[#FFF9ED] text-sm hover:bg-[#811911] hover:border-[#811911] w-[90%] m-[10px] rounded-none"
+                      className="bg-[#d5281d] border-1 mb-[0px] text-[#FFF9ED] text-sm hover:bg-[#811911] hover:border-[#811911] w-[90%] m-[10px] rounded-none"
                       onClick={goToShoppingCart}
                     >
                       View Shopping Cart
@@ -671,7 +640,7 @@ function ModalWindow(props) {
           className="rounded-xl w-[90%] text-sm p-[10px]"
           // onChange={(e) => setName(e.target.value)}
           // data-testid="name-field"
-          onKeyDown={handleKeyPress}
+        //   onKeyDown={handleKeyPress}
           tabIndex="0"
         ></input>
         <img
