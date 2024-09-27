@@ -14,8 +14,9 @@ import { CardBody } from "react-bootstrap";
 function ModalWindow(props) {
   const [isTyping, setIsTyping] = useState(false);
   const chatContainerRef = useRef(null);
-  //   const [userMessages, setUserMessages] = useState([]);
+  const [userMessages, setUserMessages] = useState([]);
   const [newUserMessage, setNewUserMessage] = useState("");
+  const [products, setProducts] = useState([]);
   const [checkedItems, setCheckedItems] = useState([]);
   const [reviewChecked, setReviewChedked] = useState([]);
   const { handleAddToCart } = useCartContext();
@@ -29,21 +30,6 @@ function ModalWindow(props) {
     console.log(chatMessage(newmsg));
     await chatMessage(newmsg)
       .then((response) => {
-        //single data
-        // sendUserMessage(response.data.outputResponse.message,
-        //     response.data.outputResponse.recipe.dishName,
-        //     response.data.outputResponse.recipe.ingredients ,
-        //     response.data.outputResponse.recipe.instructions,
-        //     response.data.outputResponse.recommendedProducts,
-        //     response.data.outputResponse.suggestedProducts);
-        //multi async data
-        // sendUserMessage(response.data.recipeResponse.message,
-        //     response.data.recipeResponse.recipe.dishName,
-        //     response.data.recipeResponse.recipe.ingredients ,
-        //     response.data.recipeResponse.recipe.instructions,
-        //     response.data.recommendedProductsResponse.recommendedProducts,
-        //     response.data.suggestedProductsResponse.suggestedProducts);
-        // multi async with quantity data
         if (response.data.recipeResponse.recipe != null) {
           sendUserMessage(
             response.data.recipeResponse.message,
@@ -76,7 +62,7 @@ function ModalWindow(props) {
   };
 
   const navigate = useNavigate();
-  const { userMessages, setUserMessages } = useCartContext();
+  // const { userMessages, setUserMessages } = useCartContext();
 
   const goToShoppingCart = () => {
     // setMessages([...messages, userMessages]);
@@ -119,6 +105,19 @@ function ModalWindow(props) {
         ? prevSelectedItems.filter((i) => i !== item)
         : [...prevSelectedItems, item]
     );
+
+    // Update the checked property in userMessages
+    setUserMessages((prevUserMessages) =>
+      prevUserMessages.map((fields) => ({
+        ...fields,
+        suggested: fields.suggested.map((i) =>
+          i === item ? { ...i, checked: !i.checked } : i
+        ),
+        recommended: fields.recommended.map((i) =>
+          i === item ? { ...i, checked: !i.checked } : i
+        ),
+      }))
+    );
   };
 
   //handle the total amount computation
@@ -126,6 +125,14 @@ function ModalWindow(props) {
     totalAmount += amount;
     return amount;
   }
+  // overall subtotal
+  // function handleGetAmount(item) {
+  //   return item
+  //     .reduce((acc, item) => {
+  //       return acc + item.productPrice * item.quantity;
+  //     }, 0)
+  //     .toFixed(2);
+  // }
 
   //container of messages
   useEffect(() => {
@@ -476,7 +483,6 @@ function ModalWindow(props) {
                   {msg.recommended.map((data) => (
                     <div className="bg-white rounded-sm w-[100%] mt-[5px] flex p-[5px]">
                       <div className="w-[5%] mr-[5%] content-center">
-                        {/* <input type="checkbox" defaultChecked={true} /> */}
                         <input
                           type="checkbox"
                           name={data.productName}
@@ -491,14 +497,15 @@ function ModalWindow(props) {
                           {data.productName}
                         </p>
                       </div>
-                      <div className="w-[30%] content-center justify-center">
+                      <div className="w-[30%] content-center justify-center text-right mr-1">
                         <p className="font-bold mb-[0px]">
-                          ${data.finalPrice}
-                          {/* {productTotal(data.quantity,data.price)} */}
+                          ${Number(data.finalPrice).toFixed(2)}
                         </p>
-                        <p className="text-[9px] mb-[0px]">
-                          ${data.productPrice}
-                        </p>
+                        {data.quantity > 1 && (
+                          <p className="text-[9px] mb-[0px]">
+                            ${Number(data.productPrice).toFixed(2)} ea.
+                          </p>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -536,12 +543,13 @@ function ModalWindow(props) {
 
                       <div className="w-[20%] content-center mr-[5px]">
                         <p className=" font-bold mb-[0px]">
-                          ${data.productPrice}
-                          {/* {productTotal(data.quantity,data.price)} */}
+                          {isNaN(Number(data.productPrice))
+                            ? data.productPrice
+                            : `$${parseFloat(data.productPrice).toFixed(2)}`}
                         </p>
-                        <p className="text-[9px] mb-[0px]">
+                        {/* <p className="text-[9px] mb-[0px]">
                           ${data.productPrice}
-                        </p>
+                        </p> */}
                       </div>
                     </div>
                   ))}
@@ -567,22 +575,35 @@ function ModalWindow(props) {
                           {item.productName}
                         </p>
                       </div>
-                      <div className="w-[20%] content-center font-bold mr-[5px]">
+                      {/* <div className="w-[20%] content-center font-bold mr-[5px]">
                         <p className="mb-[0px]">
-                          ${handleGetAmount(item.finalPrice)}
+                          ${handleGetAmount(item.productPrice, item.quantity)}
                         </p>
+                      </div> */}
+                      <div className="w-[30%] content-center justify-center text-right mr-1">
+                        <p className="font-bold mb-[0px]">
+                          $
+                          {handleGetAmount(
+                            item.finalPrice || item.productPrice
+                          ).toFixed(2)}
+                        </p>
+                        {item.quantity > 1 && (
+                          <p className="text-[9px] mb-[0px]">
+                            ${Number(item.productPrice).toFixed(2)} ea.
+                          </p>
+                        )}
                       </div>
                     </div>
                   ))}
 
                   <div className="content-center">
                     <button
-                      className="bg-[#d5281d] border-1 text-[#FFF9ED] text-sm hover:bg-[#811911] hover:border-[#811911] w-[90%] m-[10px] rounded-none mb-[0px]"
+                      className="bg-[#d5281d] border-1 font-bold text-[#FFF9ED] text-sm hover:bg-[#811911] hover:border-[#811911] w-[90%] m-[10px] rounded-none mb-[0px]"
                       onClick={() => {
                         handleAddToCart(checkedItems), handleSendShoppingCart();
                       }}
                     >
-                      Add to cart &nbsp; ${totalAmount}
+                      Add to cart &nbsp; ${totalAmount.toFixed(2)}
                     </button>
                   </div>
                 </div>
@@ -600,7 +621,7 @@ function ModalWindow(props) {
                   <div className="content-center">
                     {/* <Link to="/shoppingcart"> */}
                     <button
-                      className="bg-[#d5281d] border-1 mb-[0px] text-[#FFF9ED] text-sm hover:bg-[#811911] hover:border-[#811911] w-[90%] m-[10px] rounded-none"
+                      className="bg-[#d5281d] font-bold border-1 mb-[0px] text-[#FFF9ED] text-sm hover:bg-[#811911] hover:border-[#811911] w-[90%] m-[10px] rounded-none"
                       onClick={goToShoppingCart}
                     >
                       View Shopping Cart
@@ -612,8 +633,6 @@ function ModalWindow(props) {
             ) : (
               ""
             )}
-            {/* </div>
-                        ))} */}
           </div>
         ))}
         {

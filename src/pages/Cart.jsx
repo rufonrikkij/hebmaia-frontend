@@ -67,18 +67,17 @@ const Cart = () => {
 
   return (
     <>
-      <header className="text-3xl font-bold">Review cart</header>
       <div className=" mt-20 ">
         <div class="right-sidebar-grid">
           {totalQuantity === 0 ? (
-            <main class="main-content flex justify-center items-center h-[60vh]">
-              <div className="text-center">
+            <main class="main-content">
+              <p className="text-3xl font-bold mb-4 p-1">Review cart</p>
+              <div className="flex flex-col justify-center items-center h-screen">
                 <i class="bi bi-cart-fill text-[60px] text-gray-300"></i>
                 <p className="font-bold text-2xl mt-2">Your cart is empty</p>
                 <p className="text-base mt-2">
                   Fill it up with all the things you love
                 </p>
-                {/* Put chat link here */}
                 <button className="font-bold rounded-3xl py-2.5 px-5 mt-4 bg-[#E1251B] border-[#E1251B] text-white">
                   Start Shopping
                 </button>
@@ -86,20 +85,20 @@ const Cart = () => {
             </main>
           ) : (
             <main class="main-content">
+              <p className="text-3xl font-bold mb-4 p-1">Review cart</p>
               {cart.map((item, index) => (
                 <>
                   <div key={index}>
                     <div className="row">
                       {/* delete item */}
-                      <div className="col-sm-1 flex items-center">
+                      <div className="col-sm-2 flex items-center">
                         <button
                           className=""
                           onClick={() => handleDelete(index)}
                         >
                           <i className="bi bi-x-circle"></i>
                         </button>
-                      </div>
-                      <div className="col-sm-1">
+
                         <img src={item.imageUrl} className="w-20 mr-auto" />
                       </div>
 
@@ -185,7 +184,7 @@ const Cart = () => {
 
           {/* Right sidebar */}
           <section class="right-sidebar">
-            <div className="card">
+            <div className="card mt-5">
               <div className="card-body">
                 <p className="font-bold text-2xl">Order summary</p>
                 <div className="row mt-4">
