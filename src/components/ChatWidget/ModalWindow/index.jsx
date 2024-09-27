@@ -99,14 +99,14 @@ function ModalWindow(props) {
   //     setCheckedItems("check",initialCheckedItems);
   //   }, [userMessages]);
 
-  useEffect(() => {
-    const initialCheckedItems = userMessages.flatMap((fields) =>
-      [...fields.suggested, ...fields.recommended].filter(
-        (item) => item.checked
-      )
-    );
-    setCheckedItems(initialCheckedItems);
-  }, [userMessages]);
+  // useEffect(() => {
+  //   const initialCheckedItems = userMessages.flatMap((fields) =>
+  //     [...fields.suggested, ...fields.recommended].filter(
+  //       (item) => item.checked
+  //     )
+  //   );
+  //   setCheckedItems(initialCheckedItems);
+  // }, [userMessages]);
 
   const handleCheckedItem = (item) => {
     setCheckedItems((prevSelectedItems) =>
