@@ -122,8 +122,21 @@ function ModalWindow(props) {
 
   //handle the total amount computation
   function handleGetAmount(amount) {
-    totalAmount += amount;
-    return amount;
+    if(typeof amount === 'string'){
+      if(amount.includes('$')){
+        const  newAmount = parseFloat(amount.replace(/[$,]/g, ''));
+        totalAmount += newAmount;
+        return newAmount;
+      }else{
+        const newAmount = parseFloat(amount);
+        totalAmount += newAmount;
+        return newAmount;
+      }
+      
+    }else{
+      totalAmount += amount;
+      return amount;
+    }
   }
   // overall subtotal
   // function handleGetAmount(item) {
@@ -567,11 +580,11 @@ function ModalWindow(props) {
                   {checkedItems.map((item) => (
                     <div className="bg-white w-[100%] rounded-sm mt-[5px] flex p-[5px]">
                       <div className="w-[10%] mr-[5%] content-center">
-                        <input type="checkbox" defaultChecked={true} />
+                      <b className="mb-[0px]">{item.quantity}x</b>
                       </div>
                       <div className="w-[70%] mr-[5px]">
                         <p className="mb-[0px]">
-                          <b className="mb-[0px]">{item.quantity}x</b>{" "}
+                          {" "}
                           {item.productName}
                         </p>
                       </div>
