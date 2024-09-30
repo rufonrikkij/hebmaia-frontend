@@ -12,6 +12,9 @@ export const CartContextProvider = ({ children }) => {
     return savedCartItems ? JSON.parse(savedCartItems) : [];
   });
 
+  
+  const [messages, setMessages] = useState([]);
+
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
@@ -60,6 +63,8 @@ export const CartContextProvider = ({ children }) => {
         handleDeleteAll,
         handleDeleteItem,
         updateCartQuantity,
+        messages,
+        setMessages,
       }}
     >
       {children}

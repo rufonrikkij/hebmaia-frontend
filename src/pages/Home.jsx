@@ -3,6 +3,8 @@ import "../assets/Style.css";
 import ChatWidget from "../components/ChatWidget";
 
 export default function () {
+
+    
   return (
     <>
       <div data-testid="home-page" className="overflow-hidden">
