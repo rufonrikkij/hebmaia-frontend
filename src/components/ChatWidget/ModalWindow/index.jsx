@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Link, useState, useEffect, useRef } from "react";
 import { chatMessage } from "../../../service/ChatAIService";
 import { useCartContext } from "../../../components/CartContext";
+import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { CardBody } from "react-bootstrap";
@@ -187,6 +188,14 @@ function ModalWindow(props) {
     // setShowSuggestions(false);
   };
 
+  useEffect(() => {
+    if (newUserMessage) {
+      //   chatContainerRef.current.scrollTop =
+      //     chatContainerRef.current.scrollHeight;
+      chatContainerRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [newUserMessage]);
+
   //handle redirect user to shopping cart
   const handleSendShoppingCart = () => {
     
@@ -223,6 +232,7 @@ function ModalWindow(props) {
     sgt
   ) => {
     // setIsLoading(true);
+    setIsTyping(true);
     if (dish != "") {
       if (aimsg == "Your generated message") {
         setTimeout(() => {
@@ -262,6 +272,7 @@ function ModalWindow(props) {
           //   setIsLoading(false);
         });
       }
+     
       setTimeout(() => {
         setUserMessages((prevMessages) => [
           ...prevMessages,
@@ -278,8 +289,11 @@ function ModalWindow(props) {
           },
         ]);
         //   setIsLoading(false);
+        setIsTyping(false);
       }, 2000);
+      // setIsTyping(true);
       setTimeout(() => {
+        
         setUserMessages((prevMessages) => [
           ...prevMessages,
           {
@@ -296,6 +310,7 @@ function ModalWindow(props) {
           },
         ]);
         //   setIsLoading(false);
+        setIsTyping(false);
       }, 8000);
       setTimeout(() => {
         setUserMessages((prevMessages) => [
@@ -398,6 +413,7 @@ function ModalWindow(props) {
 
   //handle new chat
   const handleNewChat = () => {
+    setMessages([])
     setUserMessages([
       {
         dishName: "",
@@ -429,13 +445,17 @@ function ModalWindow(props) {
     >
       <div className="bg-[#d5281d] flex">
         <img
-          className="img w-auto h-[50px]"
+          className="img cursor-pointer w-auto h-[50px]"
           src="src/assets/img/chat-icon.png"
+          onClick={handleNewChat}
           alt="MAIA"
         />
-        <p className="font-sans font text-sm text-[#ffffff] font-bold mt-[15px]">
+        <p className="font-sans cursor-pointer font text-sm text-[#ffffff] font-bold mt-[15px]" onClick={handleNewChat}>
           HEB.MAIA
         </p>
+        
+        {/* <i className="ml-auto mr-[20px] content-center text-[#ffffff] bi bi-x-circle"></i> */}
+        
       </div>
 
       <div
