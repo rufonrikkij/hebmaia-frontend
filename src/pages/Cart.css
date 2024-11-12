@@ -57,3 +57,11 @@
     }
 }
 
+@media (max-width: 768px) {
+    .product-img{
+        margin-left: 0;
+        margin-right: auto;
+    }
+}
+
+
