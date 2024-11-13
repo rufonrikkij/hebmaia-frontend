@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import "./Cart.css";
-import { Button, Card, Col, Row } from "react-bootstrap";
 import { useCartContext } from "../components/CartContext";
 import Header from "../components/Header";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -90,24 +89,26 @@ const Cart = () => {
                 <>
                   <div key={index}>
                     <div className="row">
-                      {/* delete item */}
                       <div className="col-sm-2 flex items-center">
                         <button
-                          className=""
+                          className="mr-2"
                           onClick={() => handleDelete(index)}
+                          style={{ backgroundColor: "transparent", padding: 0 }}
                         >
                           <i className="bi bi-x-circle"></i>
                         </button>
-
-                        <img src={item.imageUrl} className="w-20 mr-auto" />
+                        <img
+                          src={item.imageUrl}
+                          className="w-20 ml-auto product-img"
+                        />
                       </div>
 
                       <div className="col-sm-10">
                         <div className="row">
-                          <div className="col-sm-9">
+                          <div className="col-9 col-sm-9">
                             <p className="text-base">{item.productName}</p>
                           </div>
-                          <div className="col-sm-3">
+                          <div className="col-3 col-sm-3">
                             <h6 className="text-right font-bold text-xl">
                               $
                               {(item.productPrice * quantity[index]).toFixed(2)}

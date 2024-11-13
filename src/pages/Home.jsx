@@ -1,17 +1,16 @@
 import Header from "../components/Header";
 import "../assets/Style.css";
 import ChatWidget from "../components/ChatWidget";
+import "./Home.css";
 
 export default function () {
-
-    
   return (
     <>
       <div data-testid="home-page" className="overflow-hidden">
-        <div className="w-full h-[56vh] mt-[40px]  bg-[#e6e6e6] justify-center flex  align-text-top">
+        <div className="gray-bg w-full h-[56vh] mt-[40px]  bg-[#e6e6e6] justify-center flex  align-text-top">
           <div className=" w-[100%] mt-10 top-[100%] align-text-top md:-[50%] max-w-full h-fit text-[#000000] p-4  overflow-hidden ">
             <div className="ml-[50px] mr-[50px] text-center">
-              <h1 className="font-sans text-5xl tracking-wider opacity-80">
+              <h1 className="font-sans text-5xl tracking-wider opacity-80 title">
                 HEB MAIA
               </h1>
               <p className="mt-[20px] tracking-wider text-base opacity-80">
@@ -33,8 +32,8 @@ export default function () {
             </div>
           </div>
         </div>
-        <div className=" h-[45vh] mt-[20px] ml-[30px] mr-[100px]  bg-[#d51408] justify-center flex overflow-visible align-text-top border-double hover:border-double border-[40px] border-[#ffffff]">
-          <div className=" w-[100%] top-[100%] align-text-top md:-[50%] max-w-full h-fit text-[#000000] p-4 overflow-hidden ">
+        <div className="bg-service h-[45vh] mt-[20px] ml-[30px] mr-[100px]  bg-[#d51408] justify-center flex overflow-visible align-text-top border-double hover:border-double border-[40px] border-[#ffffff]">
+          <div className="service-layout w-[100%] top-[100%] align-text-top md:-[50%] max-w-full h-fit text-[#000000] p-4 overflow-hidden">
             <div className=" text-white text-start ml-[10px] mr-[10px]">
               <h1 className="font-sans text-xl tracking-wider">SERVICES</h1>
               <p className="mt-[20px] tracking-widest text-base">

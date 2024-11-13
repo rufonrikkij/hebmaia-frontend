@@ -1,0 +1,33 @@
+@media (max-width: 500px) {
+    /* .md\\:hidden {
+      display: flex;
+      flex-direction: row;
+    }
+    .md\\:block {
+      display: flex;
+      flex-direction: row;
+    } */
+
+    
+  .header-list li p{
+    font-size: 13px;
+    margin-left: 12px;
+    margin-right: 0;
+    margin-bottom: 15px;
+    align-items: left;
+  }
+
+  .header-list{
+    margin: 0;
+    padding: 0;
+    margin-left: 10px;
+  }
+ .header-img {
+  margin-top: 10px;
+  height: 30px;
+  margin-left: 0px;
+  margin-bottom: 10px;
+  margin-right: 10px;
+ }
+
+  }
